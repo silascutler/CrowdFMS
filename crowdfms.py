@@ -8,7 +8,7 @@ import os
 import thread
 import time
 
-from lib.core import funct_parse_rule_actions, func_pull_feed, func_to_epoch, func_download_sample, func_set_api_key, funct_run_rule_action
+from lib.core import funct_parse_rule_actions, func_pull_feed, func_to_epoch, func_download_sample, func_set_api_key, funct_run_rule_action, func_delete_notif
 from lib.objects import sample
 from lib.db import db_shutdown
 
@@ -39,11 +39,18 @@ def loop_pull_feed():
 	global LOOP_TIME
 	
 	rule_actions = funct_parse_rule_actions()
+	vtIDS = []
 	
 	json_notif_feed = func_pull_feed(API_KEY)
 	if (json_notif_feed == 0):
 		print "Problem pulling feed.  Sleeping..."
 		return
+
+	# Notification Purge
+	for vt_notif in json_notif_feed["notifications"]:
+		vtIDS.append( int(vt_notif["id"]) )
+	func_delete_notif(API_KEY, vtIDS)
+
 
 	for vt_notif in json_notif_feed["notifications"]:
 

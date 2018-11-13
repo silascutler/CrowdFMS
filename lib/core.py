@@ -14,6 +14,21 @@ import fcntl
 
 from lib.db import *
 
+# Purge old notifications
+def func_delete_notif(str_api_key, notificationList):
+	req_user_agent = {'User-agent': 'VirusTotal FMS'}
+	try:
+		vt_request_results = requests.post("https://www.virustotal.com/intelligence/hunting/delete-notifications/programmatic/?key=%s" % (str_api_key),
+		headers=req_user_agent,
+			data=json.dumps(notificationList),
+			timeout=30,
+			verify=False)
+	except Exception, e:
+		print " [x] Exception in purge request: %s" % e
+		return "ERROR"
+
+	return None
+
 # Read ~/.virustotal and read the first line.  This file only needs the API string in it.
 def func_set_api_key():
 	try:
